@@ -1,10 +1,9 @@
 package Class::DBI::Plugin::Type;
 
-use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub import {
     no strict 'refs';
@@ -14,6 +13,7 @@ sub import {
     #    return; # My work here is done
     #}
 
+    return if $caller->can("sql_dummy");
     $caller->set_sql(dummy => <<'');
         SELECT *
         FROM __TABLE__
@@ -33,6 +33,7 @@ sub import {
                     else { $_ } # Typeless databases (SQLite)
                 }
                 @{$sth->{TYPE}};
+            $sth->finish;
             $self->_types(\%hash);
         }
         return $self->_types->{$column};
